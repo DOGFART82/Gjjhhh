@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grok Enterprise Node</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            /* تم تعديل الخلفية لتكون صورة كاملة الشاشة */
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        /* طبقة شفافة اختيارية للتأكد من وضوح المحتوى فوق الصورة */
+        .app-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0);
+            z-index: 1;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-animate { animation: slideDown 0.2s ease-out; }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: black;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* تحسين شكل الحاوية البيضاء لتناسب الخلفية المصورة */
+        .content-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="fixed inset-0 flex items-center justify-center">
+
+    <div class="app-overlay"></div>
+
+    <!-- Loading Screen -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <svg class="text-white animate-pulse mb-4" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div class="text-white text-[11px] font-bold tracking-[0.3em] uppercase mb-6 text-center px-4">Synchronizing Node...</div>
+        <div class="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-full bg-white transition-all duration-300 w-0"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="w-full max-w-[420px] h-full flex flex-col relative z-10 px-4 pt-4">
+        
+        <header class="flex flex-col items-center mb-4">
+            <div class="w-16 h-16 rounded-[24px] p-[2px] bg-gradient-to-br from-zinc-600 to-black border border-white/20 mb-2 shadow-xl overflow-hidden">
+                <img id="userPhoto" src="https://ui-avatars.com/api/?name=Node&background=000&color=fff" class="w-full h-full rounded-[22px] object-cover" alt="Profile">
+            </div>
+            <h2 id="userName" class="text-white text-[11px] font-black tracking-[0.1em] uppercase drop-shadow-md">SYNCING...</h2>
+            <div class="mt-1 px-2.5 py-0.5 bg-black/40 border border-white/20 backdrop-blur-md rounded-full">
+                <span id="userId" class="text-white/70 font-mono text-[9px] tracking-widest uppercase">UID: 000000000</span>
+            </div>
+        </header>
+
+        <div class="content-container rounded-t-[40px] shadow-[0_-20px_50px_-15px_rgba(0,0,0,0)] flex-1 p-5 pb-6 space-y-3.5 border-x border-t border-black/5 flex flex-col justify-between mb-8 overflow-hidden">
+            
+            <div class="space-y-3.5">
+                <!-- Platform Dropdown -->
+                <div class="relative">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Enterprise Source</label>
+                    <button id="dropdownBtn" class="w-full bg-zinc-50 border border-zinc-100 rounded-xl p-3.5 flex items-center justify-between transition-all active:bg-zinc-100">
+                        <div class="flex items-center gap-3">
+                            <span id="selectedPlatformText" class="text-xs font-bold text-zinc-300 uppercase">Select Access Point</span>
+                        </div>
+                        <svg class="text-zinc-400 transition-transform" id="dropdownArrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div id="dropdownMenu" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 rounded-2xl shadow-2xl z-50 max-h-[260px] overflow-y-auto no-scrollbar grid grid-cols-1 gap-1.5 p-2 dropdown-animate">
+                        <!-- Platforms injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Address Input -->
+                <div>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Destination Hash</label>
+                    <input id="addressInput" type="text" placeholder="Target Address..." class="w-full bg-zinc-50 border border-zinc-100 rounded-xl p-3.5 text-xs font-bold text-black outline-none focus:bg-white transition-all placeholder:text-zinc-200">
+                </div>
+
+                <!-- Protocols -->
+                <div>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Detected Protocol</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div data-net="TRC20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all">
+                            <img src="https://cryptologos.cc/logos/tron-trx-logo.png" class="w-7 h-7"> TRC20
+                        </div>
+                        <div data-net="BEP20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all">
+                            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" class="w-7 h-7"> BEP20
+                        </div>
+                        <div data-net="TON" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all">
+                            <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="w-7 h-7"> TON
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amounts -->
+                <div>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Resource Volume</label>
+                    <div class="flex flex-col gap-2">
+                        <button data-amt="300" data-cost="12" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
+                            <div class="text-left"><div class="text-xs font-black">300 USDT</div><div class="text-[8px] font-bold opacity-40 uppercase">Global Sync</div></div>
+                            <div class="text-[10px] font-black px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500">12$</div>
+                        </button>
+                        <button data-amt="1500" data-cost="60" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
+                            <div class="text-left"><div class="text-xs font-black">1500 USDT</div><div class="text-[8px] font-bold opacity-40 uppercase">Global Sync</div></div>
+                            <div class="text-[10px] font-black px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500">60$</div>
+                        </button>
+                        <button data-amt="3000" data-cost="100" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
+                            <div class="text-left"><div class="text-xs font-black">3000 USDT</div><div class="text-[8px] font-bold opacity-40 uppercase">Global Sync</div></div>
+                            <div class="text-[10px] font-black px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500">100$</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Area -->
+            <div class="pt-2">
+                <button id="authorizeBtn" disabled class="w-full py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 bg-zinc-100 text-zinc-300 cursor-not-allowed">
+                    Authorize <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </button>
+                <div class="text-center mt-4 opacity-30 flex flex-col items-center gap-0.5">
+                    <div class="flex items-center gap-1.5 text-black font-black text-[9px] uppercase tracking-[0.3em]">
+                        Grok Enterprise
+                    </div>
+                    <div class="text-[7px] text-zinc-500 font-bold uppercase tracking-[0.2em]">NODE v6.91: READY</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // State
+        let selectedPlatform = null;
+        let selectedNetwork = '';
+        let selectedAmount = null;
+        let addressValue = '';
+
+        const platforms = [
+            { n: 'Binance', i: 'binance.png' }, { n: 'Bybit', i: 'bybit.png' },
+            { n: 'Mexc', i: 'mexc.png' }, { n: '1xbet', i: '1xbet.png' },
+            { n: 'Linebet', i: 'linebet.png' }, { n: 'Melbet', i: 'malbet.png' },
+            { n: 'Megapari', i: 'megapari.png' }, { n: 'Trust Wallet', i: 'trustwallet.png' },
+            { n: 'MetaMask', i: 'metamask.png' }, { n: 'Phantom', i: 'phantom.png' },
+            { n: 'TronLink', i: 'tronlink.png' }, { n: 'XM', i: 'xm.png' },
+            { n: 'Tickmill', i: 'tickmall.png' }, { n: 'Exness', i: 'exness.png' },
+            { n: 'Quotex', i: 'quotex.png' }, { n: 'eToro', i: 'etoro.png' }
+        ];
+
+        // Init User
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('userName').textContent = (user.first_name + ' ' + (user.last_name || '')).toUpperCase();
+            document.getElementById('userId').textContent = 'UID: ' + user.id;
+            if (user.photo_url) document.getElementById('userPhoto').src = user.photo_url;
+        }
+
+        // Populate Platforms
+        const menu = document.getElementById('dropdownMenu');
+        platforms.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2 p-2.5 hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors border border-transparent active:bg-zinc-100';
+            div.innerHTML = `<img src="${p.i}" class="w-7 h-7 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2091/2091665.png'"><span class="text-[10px] font-bold text-zinc-700">${p.n}</span>`;
+            div.onclick = () => {
+                selectedPlatform = p;
+                document.getElementById('selectedPlatformText').innerHTML = `<img src="${p.i}" class="w-4 h-4 inline-block mr-2" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2091/2091665.png'"><span class="text-black">${p.n}</span>`;
+                menu.classList.add('hidden');
+                document.getElementById('dropdownArrow').classList.remove('rotate-180');
+                validate();
+            };
+            menu.appendChild(div);
+        });
+
+        // Dropdown Toggle
+        document.getElementById('dropdownBtn').onclick = () => {
+            menu.classList.toggle('hidden');
+            document.getElementById('dropdownArrow').classList.toggle('rotate-180');
+        };
+
+        // Address Detection
+        document.getElementById('addressInput').oninput = (e) => {
+            addressValue = e.target.value;
+            if (addressValue.startsWith('T') && addressValue.length >= 30) selectedNetwork = 'TRC20';
+            else if (addressValue.startsWith('0x') && addressValue.length >= 40) selectedNetwork = 'BEP20';
+            else if ((addressValue.startsWith('U') || addressValue.startsWith('E')) && addressValue.length >= 40) selectedNetwork = 'TON';
+            else selectedNetwork = '';
+            
+            updateNetworkUI();
+            validate();
+        };
+
+        function updateNetworkUI() {
+            document.querySelectorAll('.net-btn').forEach(btn => {
+                const isMatch = btn.dataset.net === selectedNetwork;
+                btn.className = `net-btn py-2.5 rounded-xl text-[9px] text-center font-black transition-all border flex flex-col items-center justify-center gap-1 ${isMatch ? 'bg-black border-black text-white shadow-md' : 'bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60'}`;
+            });
+        }
+
+        // Amount Selection
+        document.querySelectorAll('.amt-btn').forEach(btn => {
+            btn.onclick = () => {
+                selectedAmount = parseInt(btn.dataset.amt);
+                document.querySelectorAll('.amt-btn').forEach(b => {
+                    const active = b === btn;
+                    b.className = `amt-btn px-4 py-3 rounded-xl flex items-center justify-between transition-all border ${active ? 'bg-black border-black text-white' : 'bg-zinc-50 border-zinc-100 text-zinc-400'}`;
+                    b.querySelector('div:last-child').className = `text-[10px] font-black px-3 py-1 rounded-lg ${active ? 'bg-white text-black' : 'bg-zinc-100 text-zinc-500'}`;
+                });
+                validate();
+            };
+        });
+
+        function validate() {
+            const btn = document.getElementById('authorizeBtn');
+            const isValid = selectedPlatform && addressValue && selectedNetwork && selectedAmount;
+            if (isValid) {
+                btn.disabled = false;
+                btn.className = 'w-full py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 bg-black text-white shadow-xl shadow-black/10 active:scale-95';
+            } else {
+                btn.disabled = true;
+                btn.className = 'w-full py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 bg-zinc-100 text-zinc-300 cursor-not-allowed';
+            }
+        }
+
+        // Authorization Logic
+        document.getElementById('authorizeBtn').onclick = () => {
+            const overlay = document.getElementById('loadingOverlay');
+            const bar = document.getElementById('progressBar');
+            overlay.style.display = 'flex';
+            
+            let p = 0;
+            const interval = setInterval(() => {
+                p += 5;
+                bar.style.width = p + '%';
+                if (p >= 100) {
+                    clearInterval(interval);
+                    if (selectedAmount === 300) window.location.href = "12.html";
+                    else if (selectedAmount === 1500) window.location.href = "60.html";
+                    else if (selectedAmount === 3000) window.location.href = "100.html";
+                }
+            }, 80);
+        };
+    </script>
+</body>
+</html>
+
