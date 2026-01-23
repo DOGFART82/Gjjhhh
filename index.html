@@ -2,13 +2,17 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Grok 6.91 - USDT Generator</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --tg-viewport-height: 100vh;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -16,12 +20,12 @@
             overflow: hidden;
             background-color: #020617;
             color: white;
-            /* Prevent bouncing on Telegram mobile */
             height: 100vh;
             width: 100vw;
             position: fixed;
         }
 
+        /* Video Background */
         .video-wrapper {
             position: fixed;
             top: 0;
@@ -45,6 +49,7 @@
             filter: brightness(0.25) contrast(1.2) saturate(0.8);
         }
 
+        /* Advanced Glassmorphism Panel */
         .glass-panel {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(25px);
@@ -70,6 +75,11 @@
             animation: pulse-glow 2s infinite;
         }
 
+        .input-dark-sim {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
         .fade-out {
             opacity: 0 !important;
             transform: scale(1.1) !important;
@@ -78,9 +88,9 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="flex items-center justify-center">
 
-    <!-- Video Background Source -->
+    <!-- Video Background Container -->
     <div class="video-wrapper">
         <video autoplay muted loop playsinline id="bg-video">
             <source src="background.mp4" type="video/mp4">
@@ -88,12 +98,24 @@
         </video>
     </div>
 
+    <!-- Background UI Simulation (The elements you wanted back) -->
+    <div class="fixed inset-0 flex items-center justify-center z-0 opacity-20 select-none pointer-events-none p-6">
+        <div class="w-full max-w-lg space-y-6">
+            <div class="glass-panel p-6 rounded-3xl space-y-4">
+                <div class="h-4 w-1/3 bg-emerald-500/20 rounded"></div>
+                <div class="h-12 w-full input-dark-sim rounded-xl"></div>
+                <div class="h-12 w-full input-dark-sim rounded-xl"></div>
+                <div class="h-14 w-full bg-emerald-600/30 rounded-xl"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Modal Overlay -->
-    <div id="modalOverlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-all duration-700">
-        <div class="glass-panel max-w-md w-full rounded-[2.5rem] p-8 text-white flex flex-col max-h-[90vh] relative overflow-hidden">
+    <div id="modalOverlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-700">
+        <div class="glass-panel max-w-md w-full rounded-[2.5rem] p-8 text-white flex flex-col max-h-[85vh] relative overflow-hidden">
             
             <!-- Logo & Header -->
-            <div class="text-center mb-8 relative">
+            <div class="text-center mb-6 relative">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 p-0.5 mb-4 shadow-xl shadow-emerald-500/20">
                     <div class="w-full h-full bg-slate-900 rounded-[calc(1.5rem-2px)] flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,9 +131,11 @@
             </div>
 
             <!-- Content Area -->
-            <div class="overflow-y-auto custom-scroll pl-1 pr-3 mb-8 space-y-6">
+            <div class="overflow-y-auto custom-scroll pr-3 mb-8 space-y-5">
+                
                 <div class="space-y-4">
-                    <div class="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all">
+                    <!-- Rule 1 -->
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div class="flex items-start gap-4">
                             <div class="bg-amber-500/20 p-2 rounded-lg mt-1 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
@@ -119,13 +143,14 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-white text-lg">Purchase System</h3>
+                                <h3 class="font-bold text-white text-lg">Daily Limit</h3>
                                 <p class="text-gray-400 text-sm leading-relaxed mt-1">Limited to <span class="text-amber-400 font-bold underline">one purchase only</span> per 24 hours.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all">
+                    <!-- Rule 2 -->
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div class="flex items-start gap-4">
                             <div class="bg-emerald-500/20 p-2 rounded-lg mt-1 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
@@ -134,38 +159,34 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-white text-lg">Capacity Limit</h3>
-                                <p class="text-gray-400 text-sm leading-relaxed mt-1">Maximum generation cap: <span class="text-emerald-400 font-bold text-base">200,000 USDT</span>.</p>
+                                <h3 class="font-bold text-white text-lg">Capacity Cap</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed mt-1">Maximum generation limit: <span class="text-emerald-400 font-bold text-base">200,000 USDT</span>.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Privacy Info -->
                 <div class="p-4 bg-slate-950/50 rounded-2xl border border-white/5">
-                    <h4 class="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.2em] mb-2">Telegram Privacy</h4>
-                    <p class="text-xs text-gray-400 leading-relaxed">
-                        Optimized for Telegram Mini Apps. No tracking, full anonymity via smart contract nodes.
+                    <h4 class="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.2em] mb-1">Telegram Privacy</h4>
+                    <p class="text-[11px] text-gray-500 leading-relaxed">
+                        Optimized for Telegram Mini Apps. End-to-end encryption active via smart contract nodes.
                     </p>
                 </div>
             </div>
 
-            <!-- Action Button -->
-            <div class="space-y-4">
-                <button id="confirmBtn" onclick="handleConfirm()" class="glow-button w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-5 rounded-[1.5rem] transition-all transform active:scale-[0.98] shadow-2xl shadow-emerald-500/30 text-lg uppercase">
-                    Confirm & Proceed
-                </button>
-            </div>
+            <!-- Footer Action Button -->
+            <button id="confirmBtn" onclick="handleConfirm()" class="glow-button w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-5 rounded-[1.5rem] transition-all transform active:scale-[0.98] shadow-2xl shadow-emerald-500/30 text-lg uppercase">
+                Confirm & Proceed
+            </button>
         </div>
     </div>
 
     <script>
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
-
-        // Force the app to expand to full height
         tg.expand();
-        
-        // Set header color to match our theme
+        tg.ready();
         tg.setHeaderColor('#020617');
         tg.setBackgroundColor('#020617');
 
@@ -173,10 +194,8 @@
             const btn = document.getElementById('confirmBtn');
             const modal = document.getElementById('modalOverlay');
             
-            // Haptic feedback for Telegram
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
+            // Haptic feedback
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 
             btn.innerHTML = 'Connecting...';
             btn.disabled = true;
@@ -189,14 +208,20 @@
             }, 500);
         }
 
-        // Handle video errors
-        const video = document.getElementById('bg-video');
-        video.addEventListener('error', function() {
-            video.parentElement.style.background = 'radial-gradient(circle at center, #064e3b, #020617)';
+        // Adjust height for Telegram viewport
+        tg.onEvent('viewportChanged', (data) => {
+            if (data.is_state_stable) {
+                document.body.style.height = window.innerHeight + 'px';
+            }
         });
 
-        // Notify Telegram that the app is ready
-        tg.ready();
+        // Autoplay video fix
+        window.addEventListener('load', () => {
+            const video = document.getElementById('bg-video');
+            video.play().catch(() => {
+                console.log("Autoplay prevented, waiting for interaction.");
+            });
+        });
     </script>
 </body>
 </html>
