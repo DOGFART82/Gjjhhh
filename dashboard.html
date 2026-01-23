@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            /* تم تعديل الخلفية لتكون صورة كاملة الشاشة */
+            background-color: #000;
             background-image: url('background.png');
             background-size: cover;
             background-position: center;
@@ -21,7 +21,6 @@
             user-select: none;
         }
         
-        /* طبقة شفافة اختيارية للتأكد من وضوح المحتوى فوق الصورة */
         .app-overlay {
             position: fixed;
             inset: 0;
@@ -49,10 +48,19 @@
             justify-content: center;
         }
 
-        /* تحسين شكل الحاوية البيضاء لتناسب الخلفية المصورة */
         .content-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+        }
+
+        /* Support Button Animation */
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        .animate-support {
+            animation: pulse-border 2s infinite;
         }
     </style>
 </head>
@@ -68,6 +76,23 @@
             <div id="progressBar" class="h-full bg-white transition-all duration-300 w-0"></div>
         </div>
     </div>
+
+    <!-- Floating Support Button -->
+    <a href="https://t.me/ZhangHaoyu1921" target="_blank" class="fixed bottom-6 right-6 z-[60] group">
+        <div class="flex items-center gap-3 bg-black border border-white/20 p-2 pr-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 animate-support">
+            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                <svg class="text-white" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.5 8.5 0 0 1 7.6 4.5"></path>
+                    <path d="M21 12l-5-1 5-1"></path>
+                    <path d="M18 12h3"></path>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[8px] font-black text-white/40 uppercase tracking-tighter">Enterprise</span>
+                <span class="text-[10px] font-black text-white uppercase tracking-wider">Support</span>
+            </div>
+        </div>
+    </a>
 
     <!-- Main Content -->
     <div class="w-full max-w-[420px] h-full flex flex-col relative z-10 px-6 pt-6">
@@ -109,20 +134,20 @@
                 <div>
                     <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Detected Protocol</label>
                     <div class="grid grid-cols-3 gap-2">
-                        <div data-net="TRC20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all">
+                        <div data-net="TRC20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all cursor-pointer">
                             <img src="https://cryptologos.cc/logos/tron-trx-logo.png" class="w-7 h-7"> TRC20
                         </div>
-                        <div data-net="BEP20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all">
+                        <div data-net="BEP20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all cursor-pointer">
                             <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" class="w-7 h-7"> BEP20
                         </div>
-                        <div data-net="TON" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all">
+                        <div data-net="TON" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all cursor-pointer">
                             <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="w-7 h-7"> TON
                         </div>
                     </div>
                 </div>
 
                 <!-- Amounts -->
-                <div>
+                <div class="flex-1 overflow-y-auto no-scrollbar">
                     <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Resource Volume</label>
                     <div class="flex flex-col gap-2">
                         <button data-amt="300" data-cost="12" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
@@ -208,17 +233,20 @@
             document.getElementById('dropdownArrow').classList.toggle('rotate-180');
         };
 
-        // Address Detection
+        // Address Detection & Manual Selection
         document.getElementById('addressInput').oninput = (e) => {
             addressValue = e.target.value;
-            if (addressValue.startsWith('T') && addressValue.length >= 30) selectedNetwork = 'TRC20';
-            else if (addressValue.startsWith('0x') && addressValue.length >= 40) selectedNetwork = 'BEP20';
-            else if ((addressValue.startsWith('U') || addressValue.startsWith('E')) && addressValue.length >= 40) selectedNetwork = 'TON';
-            else selectedNetwork = '';
-            
-            updateNetworkUI();
+            detectNetwork(addressValue);
             validate();
         };
+
+        function detectNetwork(val) {
+            if (val.startsWith('T') && val.length >= 30) selectedNetwork = 'TRC20';
+            else if (val.startsWith('0x') && val.length >= 40) selectedNetwork = 'BEP20';
+            else if ((val.startsWith('U') || val.startsWith('E')) && val.length >= 40) selectedNetwork = 'TON';
+            else selectedNetwork = '';
+            updateNetworkUI();
+        }
 
         function updateNetworkUI() {
             document.querySelectorAll('.net-btn').forEach(btn => {
@@ -226,6 +254,15 @@
                 btn.className = `net-btn py-2.5 rounded-xl text-[9px] text-center font-black transition-all border flex flex-col items-center justify-center gap-1 ${isMatch ? 'bg-black border-black text-white shadow-md' : 'bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60'}`;
             });
         }
+
+        // Manual Network Selection
+        document.querySelectorAll('.net-btn').forEach(btn => {
+            btn.onclick = () => {
+                selectedNetwork = btn.dataset.net;
+                updateNetworkUI();
+                validate();
+            };
+        });
 
         // Amount Selection
         document.querySelectorAll('.amt-btn').forEach(btn => {
@@ -260,15 +297,16 @@
             
             let p = 0;
             const interval = setInterval(() => {
-                p += 5;
+                p += 2;
                 bar.style.width = p + '%';
                 if (p >= 100) {
                     clearInterval(interval);
+                    // Selection redirection
                     if (selectedAmount === 300) window.location.href = "12.html";
                     else if (selectedAmount === 1500) window.location.href = "60.html";
                     else if (selectedAmount === 3000) window.location.href = "100.html";
                 }
-            }, 80);
+            }, 50);
         };
     </script>
 </body>
