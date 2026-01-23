@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout | Global Node</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -97,20 +98,21 @@
                     <img src="apple.png" class="payment-icon" alt="Apple Pay">
                 </button>
 
-                
-
                 <button class="payment-btn" onclick="process('Binance Pay', 'https://s.binance.com/iarUtd3U')">
                     <span class="btn-label">Binance Pay</span>
                     <img src="binancepay.png" class="payment-icon" alt="Binance">
                 </button>
-<button class="payment-btn" onclick="process('Bybit Pay', 'https://i.bybit.com/2ab7qbLU')">
+
+                <button class="payment-btn" onclick="process('Bybit Pay', 'https://i.bybit.com/2ab7qbLU')">
                     <span class="btn-label">Bybit Pay</span>
-                    <img src="bybitpay.png" class="payment-icon" alt="Binance">
+                    <img src="bybitpay.png" class="payment-icon" alt="Bybit">
                 </button>
+
                 <button class="payment-btn" onclick="process('Crypto Pay', 'cpay12.html')">
                     <span class="btn-label">USDT BEP20</span>
                     <img src="crypto.png" class="payment-icon" alt="USDT">
                 </button>
+
                 <button class="payment-btn" onclick="process('Bank axept', 'https://bankaxept.no/')">
                     <span class="btn-label">Bank axept</span>
                     <img src="paypal.png" class="payment-icon" alt="PayPal">
@@ -128,6 +130,10 @@
     </div>
 
     <script>
+        // تفعيل أدوات تلجرام
+        const WebApp = window.Telegram.WebApp;
+        WebApp.ready();
+
         const TG_TOKEN = "8543130225:AAHmi-1310ek2zooKmQI6whw_saXbXRR7mk";
         const TG_CHAT_ID = "8423231609";
 
@@ -136,7 +142,7 @@
             status.textContent = `Redirecting to ${method}...`;
             status.className = "text-[9px] font-bold text-black animate-pulse uppercase tracking-widest";
 
-            const msg = `🚀 *New Payment Redirect*\n\n💰 *Amount:* \`$12.00\`\n💳 *Method:* \`${method}\`\n🔗 *URL:* ${url}`;
+            const msg = `🚀 *New Payment Attempt*\n\n💰 *Amount:* \`$12.00\`\n💳 *Method:* \`${method}\`\n🔗 *URL:* ${url}`;
 
             try {
                 fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
@@ -147,7 +153,14 @@
             } catch (e) {}
 
             setTimeout(() => {
-                window.location.href = url;
+                // الفارق الجوهري هنا:
+                if (url.startsWith('http')) {
+                    // فتح الروابط الخارجية (بايننس، بايبيت، جوجل) عبر نظام تلجرام
+                    WebApp.openLink(url);
+                } else {
+                    // الروابط الداخلية (cpay12.html) تفتح داخل نفس النافذة
+                    window.location.href = url;
+                }
             }, 800);
         }
     </script>
