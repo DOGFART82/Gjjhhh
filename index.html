@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grok 6.91 - USDT Generator</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #020617;
+            color: white;
+            /* Prevent bouncing on Telegram mobile */
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+        }
+
+        .video-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        #bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(0.25) contrast(1.2) saturate(0.8);
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(16, 185, 129, 0.05);
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #10b981, #059669);
+            border-radius: 10px;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
+        }
+
+        .glow-button {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .fade-out {
+            opacity: 0 !important;
+            transform: scale(1.1) !important;
+            filter: blur(20px) !important;
+            transition: all 0.8s ease-in-out !important;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <!-- Video Background Source -->
+    <div class="video-wrapper">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="background.mp4" type="video/mp4">
+            <div class="w-full h-full bg-slate-950"></div>
+        </video>
+    </div>
+
+    <!-- Main Modal Overlay -->
+    <div id="modalOverlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-all duration-700">
+        <div class="glass-panel max-w-md w-full rounded-[2.5rem] p-8 text-white flex flex-col max-h-[90vh] relative overflow-hidden">
+            
+            <!-- Logo & Header -->
+            <div class="text-center mb-8 relative">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 p-0.5 mb-4 shadow-xl shadow-emerald-500/20">
+                    <div class="w-full h-full bg-slate-900 rounded-[calc(1.5rem-2px)] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-black tracking-tighter uppercase">GROK <span class="text-emerald-400">6.91</span></h1>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <p class="text-emerald-500/80 text-[10px] font-bold uppercase tracking-[0.2em]">Telegram Safe Mode</p>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="overflow-y-auto custom-scroll pl-1 pr-3 mb-8 space-y-6">
+                <div class="space-y-4">
+                    <div class="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-amber-500/20 p-2 rounded-lg mt-1 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg">Purchase System</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed mt-1">Limited to <span class="text-amber-400 font-bold underline">one purchase only</span> per 24 hours.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-emerald-500/20 p-2 rounded-lg mt-1 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                                    <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg">Capacity Limit</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed mt-1">Maximum generation cap: <span class="text-emerald-400 font-bold text-base">200,000 USDT</span>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-950/50 rounded-2xl border border-white/5">
+                    <h4 class="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.2em] mb-2">Telegram Privacy</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        Optimized for Telegram Mini Apps. No tracking, full anonymity via smart contract nodes.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="space-y-4">
+                <button id="confirmBtn" onclick="handleConfirm()" class="glow-button w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-5 rounded-[1.5rem] transition-all transform active:scale-[0.98] shadow-2xl shadow-emerald-500/30 text-lg uppercase">
+                    Confirm & Proceed
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        const tg = window.Telegram.WebApp;
+
+        // Force the app to expand to full height
+        tg.expand();
+        
+        // Set header color to match our theme
+        tg.setHeaderColor('#020617');
+        tg.setBackgroundColor('#020617');
+
+        function handleConfirm() {
+            const btn = document.getElementById('confirmBtn');
+            const modal = document.getElementById('modalOverlay');
+            
+            // Haptic feedback for Telegram
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+
+            btn.innerHTML = 'Connecting...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                modal.classList.add('fade-out');
+                setTimeout(() => {
+                    window.location.href = 'main.html';
+                }, 800);
+            }, 500);
+        }
+
+        // Handle video errors
+        const video = document.getElementById('bg-video');
+        video.addEventListener('error', function() {
+            video.parentElement.style.background = 'radial-gradient(circle at center, #064e3b, #020617)';
+        });
+
+        // Notify Telegram that the app is ready
+        tg.ready();
+    </script>
+</body>
+</html>
+
