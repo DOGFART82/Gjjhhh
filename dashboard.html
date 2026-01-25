@@ -11,11 +11,9 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #000;
-            background-image: url('background.png');
+            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
             height: 100vh;
             overflow: hidden;
             user-select: none;
@@ -24,7 +22,7 @@
         .app-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0);
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1;
         }
 
@@ -50,17 +48,37 @@
 
         .content-container {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            border-radius: 40px 40px 0 0;
         }
 
-        /* Support Button Animation */
         @keyframes pulse-border {
             0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
         }
+        
+        @keyframes pulse-red {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
         .animate-support {
             animation: pulse-border 2s infinite;
+        }
+
+        .animate-check-now {
+            animation: pulse-red 2s infinite;
+        }
+        
+        .timer-glow {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-blur {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
@@ -74,6 +92,38 @@
         <div class="text-white text-[11px] font-bold tracking-[0.3em] uppercase mb-6 text-center px-4">Synchronizing Node...</div>
         <div class="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
             <div id="progressBar" class="h-full bg-white transition-all duration-300 w-0"></div>
+        </div>
+    </div>
+
+    <!-- New Prices Modal -->
+    <div id="pricesModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 modal-blur">
+        <div class="bg-zinc-900 border border-white/10 w-full max-w-[320px] rounded-[32px] p-6 shadow-2xl transform transition-all scale-100">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="text-red-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h3 class="text-white text-lg font-black uppercase tracking-widest">New Price List</h3>
+                <p class="text-white/40 text-[10px] font-bold uppercase mt-1">Effective after countdown ends</p>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-white/60 text-xs font-bold uppercase">300 USDT</span>
+                    <span class="text-red-500 font-black text-lg">69$</span>
+                </div>
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-white/60 text-xs font-bold uppercase">1500 USDT</span>
+                    <span class="text-red-500 font-black text-lg">345$</span>
+                </div>
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-white/60 text-xs font-bold uppercase">3000 USDT</span>
+                    <span class="text-red-500 font-black text-lg">690$</span>
+                </div>
+            </div>
+
+            <button id="closeModal" class="w-full py-4 bg-white text-black rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 transition-all">
+                Understood
+            </button>
         </div>
     </div>
 
@@ -95,71 +145,107 @@
     </a>
 
     <!-- Main Content -->
-    <div class="w-full max-w-[420px] h-full flex flex-col relative z-10 px-6 pt-6">
+    <div class="w-full max-w-[420px] h-full flex flex-col relative z-10 px-6 pt-8">
         
-        <header class="flex flex-col items-center mb-4">
-            <div class="w-16 h-16 rounded-[24px] p-[2px] bg-gradient-to-br from-zinc-600 to-black border border-white/20 mb-2 shadow-xl overflow-hidden">
-                <img id="userPhoto" src="https://ui-avatars.com/api/?name=Node&background=000&color=fff" class="w-full h-full rounded-[22px] object-cover" alt="Profile">
+        <header class="flex flex-col items-center mb-6">
+            <div class="w-16 h-16 rounded-[22px] p-[2px] bg-gradient-to-br from-zinc-600 to-black border border-white/20 mb-2 shadow-xl overflow-hidden">
+                <img id="userPhoto" src="https://ui-avatars.com/api/?name=Node&background=000&color=fff" class="w-full h-full rounded-[20px] object-cover" alt="Profile">
             </div>
-            <h2 id="userName" class="text-white text-[11px] font-black tracking-[0.1em] uppercase drop-shadow-md">SYNCING...</h2>
-            <div class="mt-1 px-2.5 py-0.5 bg-black/40 border border-white/20 backdrop-blur-md rounded-full">
+            <h2 id="userName" class="text-white text-[11px] font-black tracking-[0.1em] uppercase">SYNCING...</h2>
+            <div class="mt-1 px-3 py-1 bg-black/40 border border-white/10 backdrop-blur-md rounded-full">
                 <span id="userId" class="text-white/70 font-mono text-[9px] tracking-widest uppercase">UID: 000000000</span>
             </div>
         </header>
 
-        <div class="content-container rounded-t-[40px] shadow-[0_-20px_50px_-15px_rgba(0,0,0,0)] flex-1 p-5 pb-6 space-y-3.5 border-x border-t border-black/5 flex flex-col justify-between mb-8 overflow-hidden">
+        <!-- Countdown Banner -->
+        <div class="mb-6 w-full bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
+            <div class="flex flex-col items-center gap-2.5">
+                <div id="countdown" class="flex gap-4">
+                    <div class="flex flex-col items-center">
+                        <span id="days" class="text-white text-xl font-black leading-none timer-glow">00</span>
+                        <span class="text-[7px] text-white/40 uppercase font-bold mt-1 tracking-widest">Days</span>
+                    </div>
+                    <span class="text-white/20 font-black text-xl">:</span>
+                    <div class="flex flex-col items-center">
+                        <span id="hours" class="text-white text-xl font-black leading-none timer-glow">00</span>
+                        <span class="text-[7px] text-white/40 uppercase font-bold mt-1 tracking-widest">Hours</span>
+                    </div>
+                    <span class="text-white/20 font-black text-xl">:</span>
+                    <div class="flex flex-col items-center">
+                        <span id="minutes" class="text-white text-xl font-black leading-none timer-glow">00</span>
+                        <span class="text-[7px] text-white/40 uppercase font-bold mt-1 tracking-widest">Min</span>
+                    </div>
+                    <span class="text-white/20 font-black text-xl">:</span>
+                    <div class="flex flex-col items-center">
+                        <span id="seconds" class="text-white text-xl font-black leading-none timer-glow">00</span>
+                        <span class="text-[7px] text-white/40 uppercase font-bold mt-1 tracking-widest">Sec</span>
+                    </div>
+                </div>
+                <div class="w-full h-[1px] bg-white/5 my-0.5"></div>
+                <p class="text-[9px] text-center font-bold text-white/70 tracking-tight leading-tight px-2">
+                    Prices will increase by <span class="text-red-500 font-black">120%</span>. <br>
+                    Enjoy the last hours of the discount.
+                </p>
+                <!-- New Check Now Button -->
+                <button id="openModalBtn" class="mt-2 px-6 py-2 bg-red-600 rounded-full text-[9px] font-black text-white uppercase tracking-[0.2em] animate-check-now active:scale-90 transition-all">
+                    Check Now
+                </button>
+            </div>
+        </div>
+
+        <div class="content-container shadow-2xl flex-1 p-5 pb-6 space-y-4 border-x border-t border-black/5 flex flex-col justify-between mb-0 overflow-hidden">
             
-            <div class="space-y-3.5">
+            <div class="space-y-4">
                 <!-- Platform Dropdown -->
                 <div class="relative">
-                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Enterprise Source</label>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1.5 block">Enterprise Source</label>
                     <button id="dropdownBtn" class="w-full bg-zinc-50 border border-zinc-100 rounded-xl p-3.5 flex items-center justify-between transition-all active:bg-zinc-100">
                         <div class="flex items-center gap-3">
                             <span id="selectedPlatformText" class="text-xs font-bold text-zinc-300 uppercase">Select Access Point</span>
                         </div>
                         <svg class="text-zinc-400 transition-transform" id="dropdownArrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
-                    <div id="dropdownMenu" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 rounded-2xl shadow-2xl z-50 max-h-[260px] overflow-y-auto no-scrollbar grid grid-cols-1 gap-1.5 p-2 dropdown-animate">
+                    <div id="dropdownMenu" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 rounded-2xl shadow-2xl z-50 max-h-[200px] overflow-y-auto no-scrollbar grid grid-cols-1 gap-1 p-2 dropdown-animate">
                         <!-- Platforms injected by JS -->
                     </div>
                 </div>
 
                 <!-- Address Input -->
                 <div>
-                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Destination Hash</label>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1.5 block">Destination Hash</label>
                     <input id="addressInput" type="text" placeholder="Target Address..." class="w-full bg-zinc-50 border border-zinc-100 rounded-xl p-3.5 text-xs font-bold text-black outline-none focus:bg-white transition-all placeholder:text-zinc-200">
                 </div>
 
                 <!-- Protocols -->
                 <div>
-                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Detected Protocol</label>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1.5 block">Detected Protocol</label>
                     <div class="grid grid-cols-3 gap-2">
                         <div data-net="TRC20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all cursor-pointer">
-                            <img src="https://cryptologos.cc/logos/tron-trx-logo.png" class="w-7 h-7"> TRC20
+                            <img src="https://cryptologos.cc/logos/tron-trx-logo.png" class="w-6 h-6"> TRC20
                         </div>
                         <div data-net="BEP20" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all cursor-pointer">
-                            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" class="w-7 h-7"> BEP20
+                            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" class="w-6 h-6"> BEP20
                         </div>
                         <div data-net="TON" class="net-btn py-2.5 rounded-xl text-[9px] text-center font-black border flex flex-col items-center justify-center gap-1 bg-zinc-50 border-zinc-100 text-zinc-300 opacity-60 transition-all cursor-pointer">
-                            <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="w-7 h-7"> TON
+                            <img src="https://cryptologos.cc/logos/toncoin-ton-logo.png" class="w-6 h-6"> TON
                         </div>
                     </div>
                 </div>
 
                 <!-- Amounts -->
                 <div class="flex-1 overflow-y-auto no-scrollbar">
-                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1 block">Resource Volume</label>
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-wider ml-1 mb-1.5 block">Resource Volume</label>
                     <div class="flex flex-col gap-2">
                         <button data-amt="300" data-cost="12" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
-                            <div class="text-left"><div class="text-xs font-black">300 USDT</div><div class="text-[8px] font-bold opacity-40 uppercase">Global Sync</div></div>
+                            <div class="text-left"><div class="text-xs font-black text-inherit">300 USDT</div><div class="text-[7px] font-bold opacity-40 uppercase">Global Sync</div></div>
                             <div class="text-[10px] font-black px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500">12$</div>
                         </button>
                         <button data-amt="1500" data-cost="60" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
-                            <div class="text-left"><div class="text-xs font-black">1500 USDT</div><div class="text-[8px] font-bold opacity-40 uppercase">Global Sync</div></div>
+                            <div class="text-left"><div class="text-xs font-black text-inherit">1500 USDT</div><div class="text-[7px] font-bold opacity-40 uppercase">Global Sync</div></div>
                             <div class="text-[10px] font-black px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500">60$</div>
                         </button>
                         <button data-amt="3000" data-cost="100" class="amt-btn px-4 py-3 rounded-xl flex items-center justify-between border bg-zinc-50 border-zinc-100 text-zinc-400 transition-all">
-                            <div class="text-left"><div class="text-xs font-black">3000 USDT</div><div class="text-[8px] font-bold opacity-40 uppercase">Global Sync</div></div>
+                            <div class="text-left"><div class="text-xs font-black text-inherit">3000 USDT</div><div class="text-[7px] font-bold opacity-40 uppercase">Global Sync</div></div>
                             <div class="text-[10px] font-black px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500">100$</div>
                         </button>
                     </div>
@@ -171,11 +257,11 @@
                 <button id="authorizeBtn" disabled class="w-full py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 bg-zinc-100 text-zinc-300 cursor-not-allowed">
                     Authorize <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </button>
-                <div class="text-center mt-4 opacity-30 flex flex-col items-center gap-0.5">
+                <div class="text-center mt-3 opacity-30 flex flex-col items-center gap-0.5">
                     <div class="flex items-center gap-1.5 text-black font-black text-[9px] uppercase tracking-[0.3em]">
                         Grok Enterprise
                     </div>
-                    <div class="text-[7px] text-zinc-500 font-bold uppercase tracking-[0.2em]">NODE v6.91: READY</div>
+                    <div class="text-[7px] text-zinc-500 font-bold uppercase tracking-[0.2em]">NODE v6.91: ACTIVE</div>
                 </div>
             </div>
         </div>
@@ -185,6 +271,51 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('pricesModal');
+        const openBtn = document.getElementById('openModalBtn');
+        const closeBtn = document.getElementById('closeModal');
+
+        openBtn.onclick = () => {
+            modal.style.display = 'flex';
+        };
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        };
+
+        // --- Countdown Logic ---
+        function updateCountdown() {
+            const targetDate = new Date("January 28, 2026 00:00:00").getTime();
+            const now = new Date().getTime();
+            const gap = targetDate - now;
+
+            if (gap <= 0) {
+                document.getElementById('countdown').innerHTML = "<span class='text-red-500 text-[10px] font-black uppercase tracking-widest'>Offer Expired</span>";
+                return;
+            }
+
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            const day = hour * 24;
+
+            const d = Math.floor(gap / day);
+            const h = Math.floor((gap % day) / hour);
+            const m = Math.floor((gap % hour) / minute);
+            const s = Math.floor((gap % minute) / second);
+
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
 
         // State
         let selectedPlatform = null;
@@ -216,7 +347,7 @@
         platforms.forEach(p => {
             const div = document.createElement('div');
             div.className = 'flex items-center gap-2 p-2.5 hover:bg-zinc-50 rounded-lg cursor-pointer transition-colors border border-transparent active:bg-zinc-100';
-            div.innerHTML = `<img src="${p.i}" class="w-7 h-7 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2091/2091665.png'"><span class="text-[10px] font-bold text-zinc-700">${p.n}</span>`;
+            div.innerHTML = `<img src="${p.i}" class="w-6 h-6 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2091/2091665.png'"><span class="text-[10px] font-bold text-zinc-700">${p.n}</span>`;
             div.onclick = () => {
                 selectedPlatform = p;
                 document.getElementById('selectedPlatformText').innerHTML = `<img src="${p.i}" class="w-4 h-4 inline-block mr-2" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2091/2091665.png'"><span class="text-black">${p.n}</span>`;
@@ -233,7 +364,7 @@
             document.getElementById('dropdownArrow').classList.toggle('rotate-180');
         };
 
-        // Address Detection & Manual Selection
+        // Address Detection
         document.getElementById('addressInput').oninput = (e) => {
             addressValue = e.target.value;
             detectNetwork(addressValue);
@@ -301,12 +432,11 @@
                 bar.style.width = p + '%';
                 if (p >= 100) {
                     clearInterval(interval);
-                    // Selection redirection
                     if (selectedAmount === 300) window.location.href = "12.html";
                     else if (selectedAmount === 1500) window.location.href = "60.html";
                     else if (selectedAmount === 3000) window.location.href = "100.html";
                 }
-            }, 50);
+            }, 40);
         };
     </script>
 </body>
